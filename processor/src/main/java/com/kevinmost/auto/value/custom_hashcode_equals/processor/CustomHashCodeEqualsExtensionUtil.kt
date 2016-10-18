@@ -103,7 +103,7 @@ private fun generateEquals(superName: String, properties: List<Property>): Metho
           val propertyType = element.returnType
           val kind = propertyType.kind
 
-          if (atLeastOneClauseHit) addCode("&& ")
+          if (atLeastOneClauseHit && !isIgnored) addCode("&& ")
           addCode(if (isIgnored) {
             "// ${skippedMessage(propertyName, element.returnType)}"
           } else if (kind == TypeKind.ARRAY) {
