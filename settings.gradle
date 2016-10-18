@@ -1,0 +1,4 @@
+rootProject.name = 'auto-value-ignore-hashcode-equals'
+include 'processor'
+include 'adapter'
+
