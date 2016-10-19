@@ -6,7 +6,7 @@ import javax.lang.model.element.ExecutableElement
 
 internal fun AutoValueExtension.Context.determineProperties(): List<Property> {
   return properties().values.map {
-    Property(it, IgnoreForHashCodeEquals::class.java.simpleName in it.annotationSimpleNames)
+    Property(it, IgnoreForHashCodeEquals::class in it.annotations)
   }
 }
 

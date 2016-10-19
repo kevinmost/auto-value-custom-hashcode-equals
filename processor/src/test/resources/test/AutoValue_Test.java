@@ -3,9 +3,12 @@ package test;
 import java.lang.Object;
 import java.lang.Override;
 import java.util.Date;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 
 final class AutoValue_Test extends $AutoValue_Test {
-  AutoValue_Test(boolean testBool, boolean[] testBoolArr, byte testByte, byte[] testByteArr, char testChar, char[] testCharArr, short testShort, short[] testShortArr, int testInt, int[] testIntArr, long testLong, long[] testLongArr, float testFloat, float[] testFloatArr, double testDouble, double[] testDoubleArr, Date testObj) {
+  AutoValue_Test(boolean testBool, @NotNull boolean[] testBoolArr, byte testByte, @NotNull byte[] testByteArr, char testChar, @NotNull char[] testCharArr, short testShort, @NotNull short[] testShortArr, int testInt, @NotNull int[] testIntArr, long testLong, @NotNull long[] testLongArr, float testFloat, @NotNull float[] testFloatArr, double testDouble, @NotNull double[] testDoubleArr, @Nullable Date testObj) {
     super(testBool, testBoolArr, testByte, testByteArr, testChar, testCharArr, testShort, testShortArr, testInt, testIntArr, testLong, testLongArr, testFloat, testFloatArr, testDouble, testDoubleArr, testObj);
   }
 

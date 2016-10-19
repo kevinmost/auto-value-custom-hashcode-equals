@@ -21,9 +21,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 internal fun CustomHashCodeEqualsExtensionShim.isApplicable(context: AutoValueExtension.Context): Boolean {
-  return context.properties().values.any { property ->
-    IgnoreForHashCodeEquals::class.java.simpleName in property.annotationSimpleNames
-  }
+  return context.properties().values.any { property -> IgnoreForHashCodeEquals::class in property.annotations }
 }
 
 internal fun CustomHashCodeEqualsExtensionShim.generateClass(
@@ -126,8 +124,16 @@ private fun generateEquals(superName: String, properties: List<Property>): Metho
 
 private fun generateConstructor(properties: Map<String, ExecutableElement>): MethodSpec {
   val params = properties.map {
-    val typeName = TypeName.get(it.value.returnType)
-    ParameterSpec.builder(typeName, it.key).build()
+    val (propertyName, property) = it
+    val typeName = TypeName.get(property.returnType)
+    ParameterSpec.builder(typeName, propertyName).apply {
+      property.annotations
+          .asSequence()
+          .filter { annotationClass -> annotationClass.simpleName in arrayOf("NotNull", "NonNull", "Nullable") }
+          .map(::annotationSpec)
+          .asIterable()
+          .let { annotationSpecs -> addAnnotations(annotationSpecs) }
+    }.build()
   }
   return MethodSpec.constructorBuilder()
       .addParameters(params)
