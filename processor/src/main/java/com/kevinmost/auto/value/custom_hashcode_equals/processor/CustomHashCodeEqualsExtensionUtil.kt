@@ -4,6 +4,7 @@ package com.kevinmost.auto.value.custom_hashcode_equals.processor
 
 import com.google.auto.value.extension.AutoValueExtension
 import com.kevinmost.auto.value.custom_hashcode_equals.adapter.IgnoreForHashCodeEquals
+import com.kevinmost.auto.value.custom_hashcode_equals.addMultiline
 import com.kevinmost.auto.value.custom_hashcode_equals.annotationSpec
 import com.kevinmost.auto.value.custom_hashcode_equals.buildMethod
 import com.kevinmost.auto.value.custom_hashcode_equals.buildParam
@@ -92,31 +93,33 @@ private fun generateEquals(superName: String, properties: List<Property>): Metho
       .controlFlow("if (o instanceof $superName)") {
         addStatement("$superName that = ($superName) o")
 
-        addCode("return\n")
-        addCode("\$>\$>")
-        var atLeastOneClauseHit = false
-        properties.forEach {
-          val (element, isIgnored) = it
-          val propertyName = element.simpleName
-          val propertyType = element.returnType
-          val kind = propertyType.kind
+        addMultiline(
+            firstLine = "return",
+            lastLine = ";"
+        ) {
+          var atLeastOneClauseHit = false
+          properties.forEach {
+            val (element, isIgnored) = it
+            val propertyName = element.simpleName
+            val propertyType = element.returnType
+            val kind = propertyType.kind
 
-          if (atLeastOneClauseHit && !isIgnored) addCode("&& ")
-          addCode(if (isIgnored) {
-            "// ${skippedMessage(propertyName, element.returnType)}"
-          } else if (kind == TypeKind.ARRAY) {
-            "java.util.Arrays.equals(this.$propertyName(), that.$propertyName())"
-          } else if (kind.isPrimitive) {
-            "this.$propertyName() == that.$propertyName()"
-          } else {
-            "(this.$propertyName() == null) ? (that.$propertyName() == null) : this.$propertyName().equals(that.$propertyName())"
-          })
-          addCode("\n")
-          atLeastOneClauseHit = atLeastOneClauseHit || !isIgnored // if we've hit at least one clause already, we need to generate a "&&"
+            val thisLine = buildString {
+              if (atLeastOneClauseHit && !isIgnored) append("&& ")
+              append(if (isIgnored) {
+                "// ${skippedMessage(propertyName, element.returnType)}"
+              } else if (kind == TypeKind.ARRAY) {
+                "java.util.Arrays.equals(this.$propertyName(), that.$propertyName())"
+              } else if (kind.isPrimitive) {
+                "this.$propertyName() == that.$propertyName()"
+              } else {
+                "(this.$propertyName() == null) ? (that.$propertyName() == null) : this.$propertyName().equals(that.$propertyName())"
+              })
+            }
+            addIndentedStatement(thisLine)
+            atLeastOneClauseHit = atLeastOneClauseHit || !isIgnored // if we've hit at least one clause already, we need to generate a "&&"
+          }
         }
-        addCode("\$<\$<")
-        addCode(";")
-        addCode("\n")
       }
       .addStatement("return false")
       .build()
@@ -141,4 +144,5 @@ private fun generateConstructor(properties: Map<String, ExecutableElement>): Met
       .build()
 }
 
-private fun skippedMessage(propertyName: Name, propertyType: TypeMirror) = "$propertyName (type: $propertyType) skipped due to @${IgnoreForHashCodeEquals::class.java.simpleName} annotation"
+private fun skippedMessage(propertyName: Name,
+    propertyType: TypeMirror) = "$propertyName (type: $propertyType) skipped due to @${IgnoreForHashCodeEquals::class.java.simpleName} annotation"

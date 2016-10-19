@@ -1,6 +1,7 @@
 package com.kevinmost.auto.value.custom_hashcode_equals
 
 import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import javax.lang.model.element.Modifier
@@ -43,3 +44,41 @@ inline fun MethodSpec.Builder.controlFlow(
   endControlFlow()
   return this
 }
+
+inline internal fun MethodSpec.Builder.addMultiline(
+    firstLine: String,
+    lastLine: String,
+    block: MultilineCodeBuilder.() -> Unit
+) {
+  addCode(MultilineCodeBuilder(firstLine, lastLine).apply { block(this) }.build())
+}
+
+internal class MultilineCodeBuilder(private val firstLine: String, private val lastLine: String) {
+
+  private val lines = mutableListOf<Pair<String, Array<out String>>>()
+
+  fun addIndentedStatement(code: String, vararg args: String) {
+    lines += code to args
+  }
+
+  internal fun build(): CodeBlock {
+    return CodeBlock.builder()
+        .add(firstLine)
+        .add("\n")
+        .add("\$>\$>")
+        .add("\$[")
+        .apply {
+          lines.forEach { line ->
+            add(line.first, *line.second)
+            add("\n")
+          }
+        }
+        .add("\$]")
+        .add("\$<\$<")
+        .add(lastLine)
+        .add("\n")
+        .build()
+  }
+
+}
+
