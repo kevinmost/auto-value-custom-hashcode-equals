@@ -36,7 +36,7 @@ final class AutoValue_Test extends $AutoValue_Test {
           && java.util.Arrays.equals(this.testFloatArr(), that.testFloatArr())
           && this.testDouble() == that.testDouble()
           && java.util.Arrays.equals(this.testDoubleArr(), that.testDoubleArr())
-          && (this.testObj() == null) ? (that.testObj() == null) : this.testObj().equals(that.testObj())
+          && ((this.testObj() == null) ? (that.testObj() == null) : this.testObj().equals(that.testObj()))
           ;
     }
     return false;

@@ -113,7 +113,7 @@ private fun generateEquals(superName: String, properties: List<Property>): Metho
               } else if (kind.isPrimitive) {
                 "this.$propertyName() == that.$propertyName()"
               } else {
-                "(this.$propertyName() == null) ? (that.$propertyName() == null) : this.$propertyName().equals(that.$propertyName())"
+                "((this.$propertyName() == null) ? (that.$propertyName() == null) : this.$propertyName().equals(that.$propertyName()))"
               })
             }
             addIndentedStatement(thisLine)
